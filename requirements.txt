@@ -6,3 +6,4 @@ newsapi-python
 pandas
 pyarrow
 python-dotenv
+pandas-gbq>=0.26.1
