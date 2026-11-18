@@ -1,0 +1,5 @@
+id,name,description,url,category,language,country
+bloomberg,Bloomberg,"Bloomberg delivers business and markets news, data, analysis, and video to the world, featuring stories from Businessweek and Bloomberg News.",http://www.bloomberg.com,business,en,us
+business-insider,Business Insider,"Business Insider is a fast-growing business site with deep financial, media, tech, and other industry verticals. Launched in 2007, the site is now the largest business news site on the web.",http://www.businessinsider.com,business,en,us
+fortune,Fortune,Fortune 500 Daily and Breaking Business News,http://fortune.com,business,en,us
+the-wall-street-journal,The Wall Street Journal,"WSJ online coverage of breaking news and current headlines from the US and around the world. Top stories, photos, videos, detailed analysis and in-depth reporting.",https://www.wsj.com,business,en,us
