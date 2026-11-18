@@ -49,7 +49,7 @@ with DAG(
 
     check_articles = BigQueryCheckOperator(
         task_id="check_articles_data",
-        sql=f"SELECT COUNT(*) FROM `{projectID}.news.articles` DATE(publish_time) BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) CURRENT_DATE();",
+        sql=f"SELECT COUNT(*) FROM `{projectID}.news.articles` DATE(publish_time) BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) AND CURRENT_DATE();",
         use_legacy_sql=False,
         project_id=projectID
     )
