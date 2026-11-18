@@ -82,7 +82,7 @@ sourcesTableJobConfig = bigquery.LoadJobConfig(
 
 articlesTableJobConfig = bigquery.LoadJobConfig(
     schema=articlesSchema,
-    write_disposition="WRITE_APPEND"
+    write_disposition="WRITE_TRUNCATE"
 )
 
 client.create_dataset(dataset=dataset, exists_ok=True)
