@@ -53,6 +53,11 @@ dataset = bigquery.Dataset(datasetID)
 dataset.location = "US"
 dataset = client.create_dataset(dataset=dataset, exists_ok=True)
 
+versionedDatasetID = f"{projectID}.news_v2"
+versionedDataset = bigquery.Dataset(versionedDatasetID)
+versionedDataset.location = "US"
+client.create_dataset(dataset=versionedDataset, exists_ok=True)
+
 sourcesTableID = f"{datasetID}.sources"
 articlesTableID = f"{datasetID}.articles"
 

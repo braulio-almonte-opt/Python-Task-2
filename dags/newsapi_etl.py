@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCheckOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 import pendulum
 import dotenv
 import os
@@ -40,4 +41,38 @@ with DAG(
             project_id=projectID
         )
 
-run_etl_pod >> [check_articles, check_sources]
+    copy_sources_to_v2 = BigQueryInsertJobOperator(
+        task_id="copy_sources_to_v2",
+        configuration={
+            "query": {
+                "query": (
+                    f"CREATE OR REPLACE TABLE `{projectID}.news_v2.sources` AS "
+                    f"SELECT * FROM `{projectID}.news.sources`"
+                ),
+                "useLegacySql": False,
+            }
+        },
+        project_id=projectID,
+        location="US",
+        gcp_conn_id="google_cloud_default",
+        deferrable=False,
+    )
+
+    copy_articles_to_v2 = BigQueryInsertJobOperator(
+        task_id="copy_articles_to_v2",
+        configuration={
+            "query": {
+                "query": (
+                    f"CREATE OR REPLACE TABLE `{projectID}.news_v2.articles` AS "
+                    f"SELECT * FROM `{projectID}.news.articles`"
+                ),
+                "useLegacySql": False,
+            }
+        },
+        project_id=projectID,
+        location="US",
+        gcp_conn_id="google_cloud_default",
+        deferrable=False,
+    )
+
+run_etl_pod >> [check_articles, check_sources] >> copy_sources_to_v2 >> copy_articles_to_v2
