@@ -168,7 +168,7 @@ Both ETL loads use `WRITE_TRUNCATE`, so each run replaces the contents of the ba
 
 ### BigQuery Results:
 news and news_v2 datasets are created
-![alt text](/screenshots/image-1.png)
+![alt text](/screenshots/image12.png)
 
 articles and sources tables (on both datasets)
 ![alt text](/screenshots/image-2.png)
