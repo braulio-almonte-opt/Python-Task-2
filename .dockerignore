@@ -1,0 +1,8 @@
+.git
+.venv
+.env
+.env.*
+newsapi-secret.env
+credentials.json
+old_files
+__pycache__

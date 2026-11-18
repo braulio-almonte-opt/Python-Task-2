@@ -1,5 +1,6 @@
 credentials.json
 .env**
+newsapi-secret.env
 !env.example
 .venv
 __pycache__

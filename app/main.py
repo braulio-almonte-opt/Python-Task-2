@@ -6,9 +6,14 @@ import datetime
 import pandas as pd
 
 load_dotenv()
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "credentials.json"
+os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "credentials.json")
 projectID = os.getenv("GOOGLE_CONSOLE_PROJECT_ID")
+if not projectID:
+    raise RuntimeError("The GOOGLE_CONSOLE_PROJECT_ID environment variable is required")
 API_KEY = os.getenv("NEWS_API_KEY")
+if API_KEY is None or not API_KEY.strip():
+    raise RuntimeError("The NEWS_API_KEY environment variable is required")
+API_KEY = API_KEY.strip()
 newsapi = NewsApiClient(api_key=API_KEY)
 
 today = datetime.datetime.today()

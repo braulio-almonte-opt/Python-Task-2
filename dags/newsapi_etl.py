@@ -1,5 +1,6 @@
 from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
+from airflow.providers.cncf.kubernetes.secret import Secret
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCheckOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 import pendulum
@@ -8,6 +9,8 @@ import os
 
 dotenv.load_dotenv()
 projectID = os.getenv("GOOGLE_CONSOLE_PROJECT_ID")
+if not projectID:
+    raise RuntimeError("Set GOOGLE_CONSOLE_PROJECT_ID in the Airflow environment")
 
 with DAG(
     'newsapi_etl',
@@ -21,22 +24,39 @@ with DAG(
         image="pythontask2-news-etl:latest",
         namespace="default",
         name="etl-pod",
-        image_pull_policy="Always",
+        image_pull_policy="IfNotPresent",
         is_delete_operator_pod=True,
         in_cluster=False, 
-        config_file="~/.kube/config"
+        config_file="~/.kube/config",
+        env_vars={
+            "GOOGLE_CONSOLE_PROJECT_ID": projectID,
+            "GOOGLE_APPLICATION_CREDENTIALS": "/var/secrets/google/credentials.json",
+        },
+        secrets=[
+            Secret(
+                deploy_type="env",
+                deploy_target="NEWS_API_KEY",
+                secret="newsapi-secrets",
+                key="NEWS_API_KEY",
+            ),
+            Secret(
+                deploy_type="volume",
+                deploy_target="/var/secrets/google",
+                secret="gcp-credentials",
+            ),
+        ],
     )
 
     check_articles = BigQueryCheckOperator(
         task_id="check_articles_data",
-        sql=f"SELECT COUNT(*) FROM `{projectID}.news.articles` WHERE DATE(publish_time) = CURRENT_DATE()",
+        sql=f"SELECT COUNT(*) FROM `{projectID}.news.articles` DATE(publish_time) BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) CURRENT_DATE();",
         use_legacy_sql=False,
         project_id=projectID
     )
 
     check_sources = BigQueryCheckOperator(
             task_id="check_sources_data",
-            sql=f"SELECT COUNT(*) FROM `{projectID}.news.sources`",
+            sql=f"SELECT COUNT(*) FROM `{projectID}.news.sources`;",
             use_legacy_sql=False,
             project_id=projectID
         )
@@ -47,7 +67,7 @@ with DAG(
             "query": {
                 "query": (
                     f"CREATE OR REPLACE TABLE `{projectID}.news_v2.sources` AS "
-                    f"SELECT * FROM `{projectID}.news.sources`"
+                    f"SELECT * FROM `{projectID}.news.sources`;"
                 ),
                 "useLegacySql": False,
             }
@@ -64,7 +84,7 @@ with DAG(
             "query": {
                 "query": (
                     f"CREATE OR REPLACE TABLE `{projectID}.news_v2.articles` AS "
-                    f"SELECT * FROM `{projectID}.news.articles`"
+                    f"SELECT * FROM `{projectID}.news.articles`;"
                 ),
                 "useLegacySql": False,
             }
