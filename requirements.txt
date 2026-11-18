@@ -1,8 +1,5 @@
 google-cloud-bigquery
 newsapi-python
-python-dotenv
-google-cloud-bigquery
-newsapi-python
 pandas
 pyarrow
 python-dotenv
